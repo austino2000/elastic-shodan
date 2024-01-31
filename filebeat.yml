@@ -1,0 +1,31 @@
+filebeat.inputs:
+- type: log
+  enabled: true
+  paths:
+    - ingest_data/updated-*.log
+    - ingest_data/*.json
+  json.keys_under_root: true
+  json.add_error_key: true
+ 
+ 
+filebeat.autodiscover:
+  providers:
+    - type: docker
+      hints.enabled: true
+ 
+processors:
+- add_docker_metadata: ~
+- drop_fields:
+       fields: ["agent.ephemeral_id", "agent.hostname", "agent.name", "agent.id", "agent.type", "agent.version", "ecs.version", "input.type", "process.name", "process.pid", "process.thread.id", "process.thread.name", "log.original", "log.offset", "log.level", "log.origin.function", "log.origin.file.name", "log.origin.file.line", "log.logger", "log.file.path"]
+ 
+setup.kibana:
+  host: ${KIBANA_HOSTS}
+  username: ${ELASTIC_USER}
+  password: ${ELASTIC_PASSWORD}
+ 
+output.elasticsearch:
+  hosts: ${ELASTIC_HOSTS}
+  username: ${ELASTIC_USER}
+  password: ${ELASTIC_PASSWORD}
+  ssl.enabled: true
+  ssl.certificate_authorities: "certs/ca/ca.crt"
